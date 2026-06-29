@@ -29,17 +29,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> loadData() async {
+    setState(() {
+      loading = true;
+    });
+
     final wallets = await StorageService.loadWallets();
 
     if (wallets.isNotEmpty) {
       wallet = wallets.first;
 
-      final data = await ApiService.getWalletData(wallet!.address);
+      final data =
+          await ApiService.getWalletData(wallet!.address);
 
       balance = data["balance"];
       idrPrice = data["idr"];
       transactions = data["transactions"];
     }
+
+    if (!mounted) return;
 
     setState(() {
       loading = false;
@@ -87,6 +94,12 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text("💼 Tabungan Miftah"),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: loadData,
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
