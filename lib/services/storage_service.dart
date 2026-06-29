@@ -24,4 +24,10 @@ class StorageService {
 
     return list.map((e) => WalletModel.fromJson(e)).toList();
   }
+
+  static Future<void> addWallet(WalletModel wallet) async {
+    final wallets = await loadWallets();
+    wallets.add(wallet);
+    await saveWallets(wallets);
+  }
 }
