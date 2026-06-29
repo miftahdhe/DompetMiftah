@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'add_wallet_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -89,7 +90,14 @@ class HomeScreen extends StatelessWidget {
           SizedBox(
             height: 55,
             child: ElevatedButton.icon(
-              onPressed: () {},
+onPressed: () {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const AddWalletScreen(),
+    ),
+  );
+},
               icon: const Icon(Icons.add),
               label: const Text(
                 "Tambah Wallet",
