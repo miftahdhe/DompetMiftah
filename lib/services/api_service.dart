@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String _blockstream =
-      "https://blockstream.info/api/address/";
+  static const String _mempool =
+      "https://mempool.space/api/address/";
 
   static const String _coinGecko =
       "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=idr";
@@ -12,20 +12,10 @@ class ApiService {
       String address) async {
     try {
       final walletRes =
-          await http.get(Uri.parse("$_blockstream$address"));
+          await http.get(Uri.parse("$_mempool$address"));
 
       final priceRes =
           await http.get(Uri.parse(_coinGecko));
-
-      print("===== API DEBUG =====");
-      print("Wallet URL : $_blockstream$address");
-      print("Wallet Status : ${walletRes.statusCode}");
-      print(walletRes.body);
-
-      print("Price URL : $_coinGecko");
-      print("Price Status : ${priceRes.statusCode}");
-      print(priceRes.body);
-      print("=====================");
 
       if (walletRes.statusCode != 200 ||
           priceRes.statusCode != 200) {
@@ -46,15 +36,9 @@ class ApiService {
       return {
         "balance": balanceBtc,
         "idr": idr,
-        "transactions":
-            wallet["chain_stats"]["tx_count"],
+        "transactions": wallet["chain_stats"]["tx_count"],
       };
-    } catch (e, s) {
-      print("===== ERROR =====");
-      print(e);
-      print(s);
-      print("=================");
-
+    } catch (e) {
       return {
         "balance": 0.0,
         "idr": 0,
