@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/wallet_model.dart';
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
@@ -151,10 +152,21 @@ class _HomeScreenState extends State<HomeScreen> {
               leading: const Icon(Icons.account_balance_wallet),
               title: const Text("Alamat Wallet"),
               subtitle: Text(wallet!.address),
+              trailing: IconButton(
+                icon: const Icon(Icons.copy),
+                onPressed: () async {
+                  await Clipboard.setData(
+                    ClipboardData(text: wallet!.address),
+                  );
+          
+                  if (!mounted) return;
+          
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Alamat berhasil disalin"),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
