@@ -1,112 +1,110 @@
 import 'package:flutter/material.dart';
+import '../models/wallet_model.dart';
+import '../services/storage_service.dart';
 import 'add_wallet_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  WalletModel? wallet;
+  bool loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadWallet();
+  }
+
+  Future<void> loadWallet() async {
+    final wallets = await StorageService.loadWallets();
+
+    if (wallets.isNotEmpty) {
+      wallet = wallets.first;
+    }
+
+    setState(() {
+      loading = false;
+    });
+  }
+
+  Future<void> openAddWallet() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const AddWalletScreen(),
+      ),
+    );
+
+    if (result == true) {
+      await loadWallet();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF111827),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF111827),
-        elevation: 0,
+        title: const Text("💼 Tabungan Miftah"),
         centerTitle: true,
-        title: const Text(
-          "💼 Tabungan Miftah",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-
-          Card(
-            color: const Color(0xFF1F2937),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: const [
-                  Icon(
-                    Icons.account_balance_wallet,
-                    color: Colors.orange,
-                    size: 50,
+      body: loading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : wallet == null
+              ? Center(
+                  child: ElevatedButton.icon(
+                    onPressed: openAddWallet,
+                    icon: const Icon(Icons.add),
+                    label: const Text("Tambah Wallet"),
                   ),
-                  SizedBox(height: 10),
-                  Text(
-                    "Bitcoin Wallet",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            children: [
+                              const Icon(
+                                Icons.account_balance_wallet,
+                                size: 60,
+                                color: Colors.orange,
+                              ),
+                              const SizedBox(height: 15),
+                              const Text(
+                                "Tabungan Miftah",
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Text(
+                                wallet!.address,
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: openAddWallet,
+                        icon: const Icon(Icons.edit),
+                        label: const Text("Ganti Wallet"),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 15),
-                  Text(
-                    "0.00000000 BTC",
-                    style: TextStyle(
-                      color: Colors.orange,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "≈ Rp 0",
-                    style: TextStyle(
-                      color: Colors.greenAccent,
-                      fontSize: 20,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          Card(
-            color: const Color(0xFF1F2937),
-            child: const ListTile(
-              leading: Icon(Icons.show_chart,color: Colors.green),
-              title: Text("Harga Bitcoin"),
-              subtitle: Text("Loading..."),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          Card(
-            color: const Color(0xFF1F2937),
-            child: const ListTile(
-              leading: Icon(Icons.history,color: Colors.amber),
-              title: Text("Transaksi Terakhir"),
-              subtitle: Text("Belum ada transaksi"),
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          SizedBox(
-            height: 55,
-            child: ElevatedButton.icon(
-onPressed: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const AddWalletScreen(),
-    ),
-  );
-},
-              icon: const Icon(Icons.add),
-              label: const Text(
-                "Tambah Wallet",
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
-          ),
-        ],
-      ),
+                ),
     );
   }
 }
