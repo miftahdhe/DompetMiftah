@@ -17,26 +17,31 @@ class ApiService {
       final priceRes =
           await http.get(Uri.parse(_coinGecko));
 
+      print("===== API DEBUG =====");
+      print("Wallet URL : $_blockstream$address");
+      print("Wallet Status : ${walletRes.statusCode}");
+      print(walletRes.body);
+
+      print("Price URL : $_coinGecko");
+      print("Price Status : ${priceRes.statusCode}");
+      print(priceRes.body);
+      print("=====================");
+
       if (walletRes.statusCode != 200 ||
           priceRes.statusCode != 200) {
         throw Exception("API Error");
       }
 
-      final wallet =
-          jsonDecode(walletRes.body);
-
-      final price =
-          jsonDecode(priceRes.body);
+      final wallet = jsonDecode(walletRes.body);
+      final price = jsonDecode(priceRes.body);
 
       final balanceSat =
           wallet["chain_stats"]["funded_txo_sum"] -
               wallet["chain_stats"]["spent_txo_sum"];
 
-      final balanceBtc =
-          balanceSat / 100000000;
+      final balanceBtc = balanceSat / 100000000;
 
-      final idr =
-          price["bitcoin"]["idr"];
+      final idr = price["bitcoin"]["idr"];
 
       return {
         "balance": balanceBtc,
@@ -44,7 +49,12 @@ class ApiService {
         "transactions":
             wallet["chain_stats"]["tx_count"],
       };
-    } catch (e) {
+    } catch (e, s) {
+      print("===== ERROR =====");
+      print(e);
+      print(s);
+      print("=================");
+
       return {
         "balance": 0.0,
         "idr": 0,
